@@ -1,5 +1,6 @@
 var WIDTH = 1000;
 var HEIGHT = 500;
+var NEW_SCALE;
 
 //define projection and path generator
 var projection = d3.geoEquirectangular().translate([WIDTH / 2, HEIGHT / 2]);
@@ -8,17 +9,25 @@ var path = d3.geoPath().projection(projection);
 //define the changes when panning/zooming
 var zooming = function (event) {
   var offset = [event.transform.x, event.transform.y];
-  var newScale = event.transform.k * 2000;
+  NEW_SCALE = event.transform.k * 2000;
 
-  projection.translate(offset).scale(newScale);
+  projection.translate(offset).scale(NEW_SCALE);
 
   //update all country/ocean paths
   svg.selectAll("path").attr("d", path);
+
   //update earthquake circles
   svg
     .selectAll("circle")
     .attr("cx", (d) => projection([d.Longitude, d.Latitude])[0])
     .attr("cy", (d) => projection([d.Longitude, d.Latitude])[1]);
+
+  //update tecPlates
+  renderTecPlates();
+  svg
+    .selectAll("text")
+    .attr("x", (d) => path.centroid(d)[0] - d.properties.PlateName.length * 5)
+    .attr("y", (d) => path.centroid(d)[1]);
 };
 
 //define zoom behaviour
@@ -58,32 +67,36 @@ var map = svg
   );
 var oceans = map.append("g").attr("id", "oceans");
 var countries = map.append("g").attr("id", "countries");
+var tecPlates = map.append("g").attr("id", "tectonicPlates");
 var eq = map.append("g").attr("id", "earthquakes");
 
 //load .geojson-files of oceans and countries
 d3.json("./../data/ne_110m_admin_0_countries.geojson").then(function (countriesJSON) {
-    //Oceans background rectangle
-    oceans
-      .append("rect")
-      .attr("x", 0)
-      .attr("y", 0)
-      .attr("width", WIDTH)
-      .attr("height", HEIGHT)
-      .style("fill", "steelblue");
+  //Oceans background rectangle
+  oceans
+    .append("rect")
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("width", WIDTH)
+    .attr("height", HEIGHT)
+    .style("fill", "steelblue");
 
-    //Country paths
-    countries
-      .selectAll("path")
-      .data(countriesJSON.features)
-      .enter()
-      .append("path")
-      .attr("d", path)
-      .style("fill", "white") //alternative light grey #e6e8eb
-      .style("stroke", "darkgrey")
-      .style("stroke-width", "1px");
+  //Country paths
+  countries
+    .selectAll("path")
+    .data(countriesJSON.features)
+    .enter()
+    .append("path")
+    .attr("d", path)
+    .style("fill", "white") //alternative light grey #e6e8eb
+    .style("stroke", "darkgrey")
+    .style("stroke-width", "1px");
 
-    //init earthquake circles with default data (year 2000-2002)
-    updateEarthquakeData(2000, 2001);
+  //render tectonic plate borders
+  renderTecPlates();
+
+  //init earthquake circles with default data (year 2000-2002)
+  updateEarthquakeData(2000, 2001);
 });
 
 //Hide unselected eqCircles after changing the range slider
@@ -165,6 +178,47 @@ function updateEarthquakeData(range1Value, range2Value) {
       });
 
     eq.selectAll("circle").data(eqData).exit().transition().remove();
+  });
+}
+
+//renders boundaries and labels of tectonic plates
+function renderTecPlates() {
+  var tecPlatesCB = document.querySelector("#tecPlates");
+  var labelTecPlatesCB = document.querySelector("#labelTecPlates");
+
+  d3.json("./../data/PB2002_plates.geojson").then(function (tecPlatesJSON) {
+    //render tecPlates boundaries, if the checkbox is checked
+    if (tecPlatesCB.checked) {
+      tecPlates
+        .selectAll("path")
+        .data(tecPlatesJSON.features)
+        .enter()
+        .append("path")
+        .attr("d", path)
+        .style("fill", "none")
+        .style("opacity", "0.2")
+        .style("stroke", "black")
+        .style("stroke-width", "1px");
+
+      //render tecPlates labels,
+      //if checkbox is checked and map is zoomed in
+      if (labelTecPlatesCB.checked && NEW_SCALE > 400) {
+        tecPlates
+          .selectAll("text")
+          .data(tecPlatesJSON.features)
+          .enter()
+          .append("text")
+          .attr("class", "label")
+          .attr("x", (d) => path.centroid(d)[0] - d.properties.PlateName.length * 5)
+          .attr("y", (d) => path.centroid(d)[1])
+          .text((d) => d.properties.PlateName);
+      } else {
+        tecPlates.selectAll("text").data(tecPlatesJSON).exit().remove();
+      }
+    } else {
+      tecPlates.selectAll("path").data(tecPlatesJSON).exit().remove();
+      tecPlates.selectAll("text").data(tecPlatesJSON).exit().remove();
+    }
   });
 }
 
