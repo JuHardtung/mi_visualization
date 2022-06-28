@@ -61,8 +61,8 @@ var countries = map.append("g").attr("id", "countries");
 var eq = map.append("g").attr("id", "earthquakes");
 
 //load .geojson-files of oceans and countries
-d3.json("./../data/world_data_110m.geojson").then(function (countriesJSON) {
-  d3.json("./../data/oceans.geojson").then(function (oceansJSON) {
+d3.json("./../data/ne_110m_admin_0_countries.geojson").then(function (countriesJSON) {
+  d3.json("./../data/ne_110m_ocean.geojson").then(function (oceansJSON) {
     //Oceans paths
     oceans
       .selectAll("path")
