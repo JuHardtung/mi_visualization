@@ -62,14 +62,13 @@ var eq = map.append("g").attr("id", "earthquakes");
 
 //load .geojson-files of oceans and countries
 d3.json("./../data/ne_110m_admin_0_countries.geojson").then(function (countriesJSON) {
-  d3.json("./../data/ne_110m_ocean.geojson").then(function (oceansJSON) {
-    //Oceans paths
+    //Oceans background rectangle
     oceans
-      .selectAll("path")
-      .data(oceansJSON.features)
-      .enter()
-      .append("path")
-      .attr("d", path)
+      .append("rect")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", WIDTH)
+      .attr("height", HEIGHT)
       .style("fill", "steelblue");
 
     //Country paths
@@ -85,7 +84,6 @@ d3.json("./../data/ne_110m_admin_0_countries.geojson").then(function (countriesJ
 
     //init earthquake circles with default data (year 2000-2002)
     updateEarthquakeData(2000, 2001);
-  });
 });
 
 //Hide unselected eqCircles after changing the range slider
