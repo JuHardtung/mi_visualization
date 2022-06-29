@@ -2,7 +2,7 @@ svg {
     display: block;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
     margin: auto;
-    padding: 1rem 0.5rem;
+    padding: 0.5rem;
   }
 
 /* TOOLTIPS */
@@ -36,4 +36,9 @@ label, .label {
   font-weight: bold;
   font-size: 14px;
   line-height: 18px;
+}
+
+/* Yearly earthquake chart/slider */
+#yearSlider {
+  margin: 1rem;
 }

@@ -1,5 +1,6 @@
 var WIDTH = 1000;
 var HEIGHT = 500;
+var MARGIN = 25;
 var NEW_SCALE;
 
 //define projection and path generator
@@ -65,13 +66,23 @@ var map = svg
     zoom.transform,
     d3.zoomIdentity.translate(WIDTH / 2, HEIGHT / 2).scale(0.0793)
   );
+
+//worldmap with earthquakes + strom data
 var oceans = map.append("g").attr("id", "oceans");
 var countries = map.append("g").attr("id", "countries");
 var tecPlates = map.append("g").attr("id", "tectonicPlates");
 var eq = map.append("g").attr("id", "earthquakes");
 
-//load .geojson-files of oceans and countries
-d3.json("./../data/ne_110m_admin_0_countries.geojson").then(function (countriesJSON) {
+//chart for displaying yearly earthquakes
+var yearlyEQS = d3
+  .select("#yearlyEQs")
+  .attr("width", WIDTH)
+  .attr("height", HEIGHT / 3);
+
+//load .geojson-files of countries
+d3.json("./../data/ne_110m_admin_0_countries.geojson").then(function (
+  countriesJSON
+) {
   //Oceans background rectangle
   oceans
     .append("rect")
@@ -178,10 +189,87 @@ function updateEarthquakeData(range1Value, range2Value) {
       });
 
     eq.selectAll("circle").data(eqData).exit().transition().remove();
+
+    renderYearlyEarthquakes(earthquakes);
   });
 }
 
-//renders boundaries and labels of tectonic plates
+//render the chart of yearly earthquakes
+function renderYearlyEarthquakes(earthquakes) {
+  var yearlyEq = [];
+  var parseTime = d3.timeParse("%Y");
+
+  //calculate the amount of earthquakes for each year
+  for (var i = 0; i < earthquakes.length; i++) {
+    var year = earthquakes[i].DateTime.substring(0, 4);
+    if (yearlyEq.length == 0) {
+      yearlyEq.push({
+        year: year,
+        count: 1,
+      });
+    }
+
+    var notExisting = true;
+    for (var j = 0; j < yearlyEq.length; j++) {
+      if (yearlyEq[j].year == year) {
+        yearlyEq[j].count += 1;
+        notExisting = false;
+      }
+    }
+    if (notExisting) {
+      yearlyEq.push({
+        year: year,
+        count: 1,
+      });
+    }
+  }
+
+  //parse years from Int to Time
+  yearlyEq.forEach(function (d) {
+    d.year = parseTime(d.year);
+  });
+
+  //define xScale
+  var xScale = d3
+    .scaleTime()
+    .domain([d3.min(yearlyEq, (d) => d.year), d3.max(yearlyEq, (d) => d.year)])
+    .range([MARGIN, WIDTH - 15]);
+
+  //define yScale
+  var yScale = d3
+    .scaleLinear()
+    .domain([0, d3.max(yearlyEq, (d) => d.count) + 10])
+    .range([HEIGHT / 3 - MARGIN, 0]);
+
+  //create X axis
+  yearlyEQS
+    .append("g")
+    .attr("class", "x axis")
+    .attr("transform", `translate(2.5,${HEIGHT / 3 - MARGIN})`)
+    .call(d3.axisBottom(xScale).ticks(15));
+
+  //create Y axis
+  yearlyEQS
+    .append("g")
+    .attr("class", "y axis")
+    .attr("transform", "translate(" + MARGIN + ",0)")
+    .call(d3.axisLeft(yScale).ticks(5));
+
+  //display the yearly amount of earthquakes
+  yearlyEQS
+    .append("g")
+    .attr("class", "bars")
+    .selectAll("rect")
+    .data(yearlyEq, (d) => d.count)
+    .enter()
+    .append("rect")
+    .attr("x", (d) => xScale(d.year))
+    .attr("y", (d) => yScale(d.count))
+    .attr("width", 5)
+    .attr("height", (d) => HEIGHT / 3 - MARGIN - yScale(d.count));
+}
+
+//render boundaries and labels of tectonic plates
 function renderTecPlates() {
   var tecPlatesCB = document.querySelector("#tecPlates");
   var labelTecPlatesCB = document.querySelector("#labelTecPlates");
