@@ -1,7 +1,11 @@
 var WIDTH = 1000;
 var HEIGHT = 500;
 var MARGIN = 25;
-var NEW_SCALE;
+var START_YEAR = 1999;
+var END_YEAR = 2002;
+var NEW_MAP_SCALE;
+
+var EQ_SCALE;
 
 //define projection and path generator
 var projection = d3.geoEquirectangular().translate([WIDTH / 2, HEIGHT / 2]);
@@ -10,9 +14,9 @@ var path = d3.geoPath().projection(projection);
 //define the changes when panning/zooming
 var zooming = function (event) {
   var offset = [event.transform.x, event.transform.y];
-  NEW_SCALE = event.transform.k * 2000;
+  NEW_MAP_SCALE = event.transform.k * 2000;
 
-  projection.translate(offset).scale(NEW_SCALE);
+  projection.translate(offset).scale(NEW_MAP_SCALE);
 
   //update all country/ocean paths
   svg.selectAll("path").attr("d", path);
@@ -62,10 +66,7 @@ var map = svg
   .append("g")
   .attr("id", "map")
   .call(zoom)
-  .call(
-    zoom.transform,
-    d3.zoomIdentity.translate(WIDTH / 2, HEIGHT / 2).scale(0.0793)
-  );
+  .call(zoom.transform, d3.zoomIdentity.translate(WIDTH / 2, HEIGHT / 2).scale(0.0793));
 
 //worldmap with earthquakes + strom data
 var oceans = map.append("g").attr("id", "oceans");
@@ -74,124 +75,146 @@ var tecPlates = map.append("g").attr("id", "tectonicPlates");
 var eq = map.append("g").attr("id", "earthquakes");
 
 //chart for displaying yearly earthquakes
+d3.select("#yearlyEqContainer")
+  .attr("width", WIDTH)
+  .attr("height", HEIGHT / 3);
+
 var yearlyEQS = d3
-  .select("#yearlyEQs")
+  .select("#yearlyEqChart")
   .attr("width", WIDTH)
   .attr("height", HEIGHT / 3);
 
 //load .geojson-files of countries
-d3.json("./../data/ne_110m_admin_0_countries.geojson").then(function (
-  countriesJSON
-) {
-  //Oceans background rectangle
-  oceans
-    .append("rect")
-    .attr("x", 0)
-    .attr("y", 0)
-    .attr("width", WIDTH)
-    .attr("height", HEIGHT)
-    .style("fill", "steelblue");
-
-  //Country paths
-  countries
-    .selectAll("path")
-    .data(countriesJSON.features)
-    .enter()
-    .append("path")
-    .attr("d", path)
-    .style("fill", "white") //alternative light grey #e6e8eb
-    .style("stroke", "darkgrey")
-    .style("stroke-width", "1px");
-
-  //render tectonic plate borders
-  renderTecPlates();
-
-  //init earthquake circles with default data (year 2000-2002)
-  updateEarthquakeData(2000, 2001);
-});
-
-//Hide unselected eqCircles after changing the range slider
-function updateEarthquakeData(range1Value, range2Value) {
+d3.json("./../data/ne_110m_admin_0_countries.geojson").then(function (countriesJSON) {
   d3.json("./../data/earthquakes_1970-2014.json").then(function (earthquakes) {
-    //filter earthquake data with year range
-    var eqData = [];
-    for (var i = 0; i < earthquakes.length; i++) {
-      var year = earthquakes[i].DateTime.substring(0, 4);
-      if (year >= range1Value && year <= range2Value) {
-        eqData.push(earthquakes[i]);
-      }
-    }
+    //Oceans background rectangle
+    oceans
+      .append("rect")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", WIDTH)
+      .attr("height", HEIGHT)
+      .style("fill", "steelblue");
 
-    //set color domain for earthquake circles
-    eqColor.domain([
-      d3.min(eqData, (d) => d.Magnitude),
-      d3.max(eqData, (d) => d.Magnitude),
-    ]);
-
-    //set radius domain for earthquake circles
-    var eqScale = d3
-      .scalePow()
-      .domain([
-        d3.min(eqData, (d) => d.Magnitude),
-        d3.max(eqData, (d) => d.Magnitude),
-      ])
-      .range([5, 10]);
-
-    //earthquake circles
-    eq.selectAll("circle")
-      .data(eqData)
+    //Country paths
+    countries
+      .selectAll("path")
+      .data(countriesJSON.features)
       .enter()
-      .append("circle")
-      .attr("magnitude", (d) => d.Magnitude)
-      .attr("lat", (d) => d.Latitude)
-      .attr("long", (d) => d.Longitude)
-      .attr("cx", (d) => projection([d.Longitude, d.Latitude])[0])
-      .attr("cy", (d) => projection([d.Longitude, d.Latitude])[1])
-      .attr("r", (d) => eqScale(d.Magnitude))
-      .attr("fill", (d) => eqColor(d.Magnitude))
-      .on("mouseover", function (event, d) {
-        //get information for tooltip
-        var magnitude = d3.select(this).attr("magnitude");
-        var latitude = Math.round(d3.select(this).attr("lat") * 100, 2) / 100;
-        var longitude = Math.round(d3.select(this).attr("long") * 100, 2) / 100;
+      .append("path")
+      .attr("d", path)
+      .style("fill", "white") //alternative light grey #e6e8eb
+      .style("stroke", "darkgrey")
+      .style("stroke-width", "1px");
 
-        //get x and y of circle for tooltip
-        var eqCx = parseInt(d3.select(this).attr("cx"));
-        var eqCy = parseInt(d3.select(this).attr("cy"));
+    //render tectonic plate borders
+    renderTecPlates();
 
-        //setup earthquake tooltip
-        d3.select("#earthquakeTooltip")
-          .style("left", eqCx + 70 + "px")
-          .style("top", eqCy + 30 + "px")
-          .select("#magnitude")
-          .text(magnitude);
+    // New select element for allowing the user to select a group!
+    var filteredEqData = getFilteredEqData(earthquakes, START_YEAR, END_YEAR);
 
-        //set earthquake tooltip data
-        d3.select("#earthquakeTooltip").select("#magnitude").text(magnitude);
-        d3.select("#earthquakeTooltip").select("#latitude").text(latitude);
-        d3.select("#earthquakeTooltip").select("#longitude").text(longitude);
-        d3.select("#earthquakeTooltip").classed("hidden", false);
+    //enter initial circles filtered by default year range
+    enterEqCircles(filteredEqData);
 
-        //resize earthquake circle
-        d3.select(this)
-          .transition()
-          .attr("r", (d) => eqScale(d.Magnitude) + 5);
-      })
-      .on("mouseout", function (d) {
-        //resize earthquake circle
-        d3.select(this)
-          .transition()
-          .attr("fill", (d) => eqColor(d.Magnitude))
-          .attr("r", (d) => eqScale(d.Magnitude));
-
-        //hide tooltip
-        d3.select("#earthquakeTooltip").classed("hidden", true);
-      });
-
-    eq.selectAll("circle").data(eqData).exit().transition().remove();
-
+    //render the yearly earthquakes chart
     renderYearlyEarthquakes(earthquakes);
   });
+});
+
+//filter earthquake data
+//returns only the earthquakes that ocurred between range1 and range2
+function getFilteredEqData(data, range1, range2) {
+  return d3.filter(data, function (point) {
+    return (
+      point.DateTime.substring(0, 4) >= range1 && point.DateTime.substring(0, 4) <= range2
+    );
+  });
+}
+
+//enter earthquake circles
+function enterEqCircles(data) {
+  //set color domain for earthquake circles
+  eqColor.domain([d3.min(data, (d) => d.Magnitude), d3.max(data, (d) => d.Magnitude)]);
+
+  //set radius domain for earthquake circles
+  EQ_SCALE = d3
+    .scalePow()
+    .domain([d3.min(data, (d) => d.Magnitude), d3.max(data, (d) => d.Magnitude)])
+    .range([5, 10]);
+
+  //add earthquake circles to DOM
+  eq.selectAll("circle")
+    .data(data)
+    .enter()
+    .append("circle")
+    .attr("magnitude", (d) => d.Magnitude)
+    .attr("lat", (d) => d.Latitude)
+    .attr("long", (d) => d.Longitude)
+    .attr("cx", (d) => projection([d.Longitude, d.Latitude])[0])
+    .attr("cy", (d) => projection([d.Longitude, d.Latitude])[1])
+    .attr("r", (d) => EQ_SCALE(d.Magnitude))
+    .attr("fill", (d) => eqColor(d.Magnitude))
+    .on("mouseover", function (event, d) {
+      //get information for tooltip
+      var magnitude = d3.select(this).attr("magnitude");
+      var latitude = Math.round(d3.select(this).attr("lat") * 100, 2) / 100;
+      var longitude = Math.round(d3.select(this).attr("long") * 100, 2) / 100;
+
+      //get x and y of circle for tooltip
+      var eqCx = parseInt(d3.select(this).attr("cx"));
+      var eqCy = parseInt(d3.select(this).attr("cy"));
+
+      //setup earthquake tooltip
+      d3.select("#earthquakeTooltip")
+        .style("left", eqCx + 100 + "px")
+        .style("top", eqCy + 30 + "px")
+        .select("#magnitude")
+        .text(magnitude);
+
+      //set earthquake tooltip data
+      d3.select("#earthquakeTooltip").select("#magnitude").text(magnitude);
+      d3.select("#earthquakeTooltip").select("#latitude").text(latitude);
+      d3.select("#earthquakeTooltip").select("#longitude").text(longitude);
+      d3.select("#earthquakeTooltip").classed("hidden", false);
+
+      //resize earthquake circle
+      d3.select(this)
+        .transition()
+        .attr("r", (d) => EQ_SCALE(d.Magnitude) + 5);
+    })
+    .on("mouseout", function (d) {
+      //resize earthquake circle
+      d3.select(this)
+        .transition()
+        .attr("fill", (d) => eqColor(d.Magnitude))
+        .attr("r", (d) => EQ_SCALE(d.Magnitude));
+
+      //hide tooltip
+      d3.select("#earthquakeTooltip").classed("hidden", true);
+    });
+}
+
+//remove circles without data bound to them
+function exitEqCircles(data) {
+  eq.selectAll("circle").data(data).exit().remove();
+}
+
+//update and transition earthquake circles after data updates
+function updateEqCircles(data) {
+  //set color domain for earthquake circles
+  eqColor.domain([d3.min(data, (d) => d.Magnitude), d3.max(data, (d) => d.Magnitude)]);
+
+  svg
+    .selectAll("circle")
+    .data(data)
+    .transition()
+    .attr("magnitude", (d) => d.Magnitude)
+    .attr("lat", (d) => d.Latitude)
+    .attr("long", (d) => d.Longitude)
+    .attr("cx", (d) => projection([d.Longitude, d.Latitude])[0])
+    .attr("cy", (d) => projection([d.Longitude, d.Latitude])[1])
+    .attr("r", (d) => EQ_SCALE(d.Magnitude))
+    .attr("fill", (d) => eqColor(d.Magnitude));
 }
 
 //render the chart of yearly earthquakes
@@ -242,7 +265,7 @@ function renderYearlyEarthquakes(earthquakes) {
     .range([HEIGHT / 3 - MARGIN, 0]);
 
   //create X axis
-  yearlyEQS
+  var xAxis = yearlyEQS
     .append("g")
     .attr("class", "x axis")
     .attr("transform", `translate(2.5,${HEIGHT / 3 - MARGIN})`)
@@ -254,6 +277,10 @@ function renderYearlyEarthquakes(earthquakes) {
     .attr("class", "y axis")
     .attr("transform", "translate(" + MARGIN + ",0)")
     .call(d3.axisLeft(yScale).ticks(5));
+
+  //offset for ticks so they don't get obstructed by range slider
+  xAxis.selectAll(".tick line").attr("y2", 10);
+  xAxis.selectAll(".tick text").attr("y", 13);
 
   //display the yearly amount of earthquakes
   yearlyEQS
@@ -267,6 +294,20 @@ function renderYearlyEarthquakes(earthquakes) {
     .attr("y", (d) => yScale(d.count))
     .attr("width", 5)
     .attr("height", (d) => HEIGHT / 3 - MARGIN - yScale(d.count));
+
+  //init rangeSlider for filtering yearly earthquakes
+  //default range -> 1999-2002
+  var slider = createD3RangeSlider(1970, 2014, "#yearlyEqContainer");
+  slider.range(START_YEAR, END_YEAR);
+
+  //onChange listener for the range slider
+  slider.onChange(function (newRange) {
+    var groupData = getFilteredEqData(earthquakes, newRange.begin, newRange.end);
+
+    updateEqCircles(groupData);
+    enterEqCircles(groupData);
+    exitEqCircles(groupData);
+  });
 }
 
 //render boundaries and labels of tectonic plates
@@ -290,7 +331,7 @@ function renderTecPlates() {
 
       //render tecPlates labels,
       //if checkbox is checked and map is zoomed in
-      if (labelTecPlatesCB.checked && NEW_SCALE > 400) {
+      if (labelTecPlatesCB.checked && NEW_MAP_SCALE > 400) {
         tecPlates
           .selectAll("text")
           .data(tecPlatesJSON.features)

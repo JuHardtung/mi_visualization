@@ -39,6 +39,48 @@ label, .label {
 }
 
 /* Yearly earthquake chart/slider */
-#yearSlider {
+#yearlyEqContainer {
   margin: 1rem;
+}
+
+.slider-container {
+  /* background-color: #f2f2f9; */
+  margin: auto;
+  display: block;
+  top: -44.5px;
+  left: 7px;
+  width: 965px;
+}
+
+.slider {
+  position: absolute;
+  border: 1px solid #AAB;
+  background: #BCE;
+  height: 100%;
+  width: 58px;
+  top: 0px;
+  cursor: move;
+}
+
+.slider .handle {
+  position: absolute;
+  height: 9px;
+  width: 9px;
+  border: 1px solid #AAB;
+  background: #9AC;
+}
+
+.slider .EE {
+  right: -4px;
+  cursor: e-resize;
+}
+
+.slider .WW {
+  cursor: w-resize;
+  left: -4px;
+}
+
+.slider .EE, .slider .WW {
+  top: 50%;
+  margin-top: -4px;
 }

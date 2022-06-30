@@ -1,0 +1,362 @@
+[
+    {
+        "DateTime": "1970/01/04 17:00:40.20",
+        "Latitude": -90.1389999999999,
+        "Longitude": -180.503,
+        "Depth": 31,
+        "Magnitude": 1,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1971/01/04 17:00:40.20",
+        "Latitude": -86.1389999999999,
+        "Longitude": -172.503,
+        "Depth": 31,
+        "Magnitude": 2,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1972/01/04 17:00:40.20",
+        "Latitude": -82.1389999999999,
+        "Longitude": -164.503,
+        "Depth": 31,
+        "Magnitude": 3,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1973/01/04 17:00:40.20",
+        "Latitude": -78.1389999999999,
+        "Longitude": -156.503,
+        "Depth": 31,
+        "Magnitude": 4,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1974/01/04 17:00:40.20",
+        "Latitude": -74.1389999999999,
+        "Longitude": -148.503,
+        "Depth": 31,
+        "Magnitude": 5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1975/01/04 17:00:40.20",
+        "Latitude": -70.1389999999999,
+        "Longitude": -140.503,
+        "Depth": 31,
+        "Magnitude": 6.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1976/01/04 17:00:40.20",
+        "Latitude": -66.1389999999999,
+        "Longitude": -132.503,
+        "Depth": 31,
+        "Magnitude": 7.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1977/01/04 17:00:40.20",
+        "Latitude": -62.1389999999999,
+        "Longitude": -124.503,
+        "Depth": 31,
+        "Magnitude": 8.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1978/01/04 17:00:40.20",
+        "Latitude": -58.1389999999999,
+        "Longitude": -116.503,
+        "Depth": 31,
+        "Magnitude": 9.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1979/01/04 17:00:40.20",
+        "Latitude": -54.1389999999999,
+        "Longitude": -108.503,
+        "Depth": 31,
+        "Magnitude": 10.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1980/01/04 17:00:40.20",
+        "Latitude": -50.1389999999999,
+        "Longitude": -100.503,
+        "Depth": 31,
+        "Magnitude": 11.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1981/01/04 17:00:40.20",
+        "Latitude": -46.1389999999999,
+        "Longitude": -92.503,
+        "Depth": 31,
+        "Magnitude": 12.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1982/01/04 17:00:40.20",
+        "Latitude": -42.1389999999999,
+        "Longitude": -84.503,
+        "Depth": 31,
+        "Magnitude": 13.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1983/01/04 17:00:40.20",
+        "Latitude": -38.1389999999999,
+        "Longitude": -76.503,
+        "Depth": 31,
+        "Magnitude": 14.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1984/01/04 17:00:40.20",
+        "Latitude": -34.1389999999999,
+        "Longitude": -68.503,
+        "Depth": 31,
+        "Magnitude": 15.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1985/01/04 17:00:40.20",
+        "Latitude": -30.1389999999999,
+        "Longitude": -60.503,
+        "Depth": 31,
+        "Magnitude": 16.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1986/01/04 17:00:40.20",
+        "Latitude": -26.1389999999999,
+        "Longitude": -52.503,
+        "Depth": 31,
+        "Magnitude": 17.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1987/01/04 17:00:40.20",
+        "Latitude": -22.1389999999999,
+        "Longitude": -44.503,
+        "Depth": 31,
+        "Magnitude": 18.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1988/01/04 17:00:40.20",
+        "Latitude": -18.1389999999999,
+        "Longitude": -36.503,
+        "Depth": 31,
+        "Magnitude": 19.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1989/01/04 17:00:40.20",
+        "Latitude": -14.1389999999999,
+        "Longitude": -28.503,
+        "Depth": 31,
+        "Magnitude": 20.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1990/01/04 17:00:40.20",
+        "Latitude": -10.1389999999999,
+        "Longitude": -20.503,
+        "Depth": 31,
+        "Magnitude": 21.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1991/01/04 17:00:40.20",
+        "Latitude": -6.1389999999999,
+        "Longitude": -12.503,
+        "Depth": 31,
+        "Magnitude": 22.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1992/01/04 17:00:40.20",
+        "Latitude": -2.1389999999999,
+        "Longitude": -4.503,
+        "Depth": 31,
+        "Magnitude": 23.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1993/01/04 17:00:40.20",
+        "Latitude": 2.1389999999999,
+        "Longitude": 4.503,
+        "Depth": 31,
+        "Magnitude": 24.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1994/01/04 17:00:40.20",
+        "Latitude": 6.1389999999999,
+        "Longitude": 12.503,
+        "Depth": 31,
+        "Magnitude": 25.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1995/01/04 17:00:40.20",
+        "Latitude": 10.1389999999999,
+        "Longitude": 20.503,
+        "Depth": 31,
+        "Magnitude": 26.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1996/01/04 17:00:40.20",
+        "Latitude": 14.1389999999999,
+        "Longitude": 28.503,
+        "Depth": 31,
+        "Magnitude": 27.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1997/01/04 17:00:40.20",
+        "Latitude": 18.1389999999999,
+        "Longitude": 36.503,
+        "Depth": 31,
+        "Magnitude": 28.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1998/01/04 17:00:40.20",
+        "Latitude": 22.1389999999999,
+        "Longitude": 44.503,
+        "Depth": 31,
+        "Magnitude": 29.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "1999/01/04 17:00:40.20",
+        "Latitude": 26.1389999999999,
+        "Longitude": 52.503,
+        "Depth": 31,
+        "Magnitude": 30.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "2000/01/04 17:00:40.20",
+        "Latitude": 30.1389999999999,
+        "Longitude": 60.503,
+        "Depth": 31,
+        "Magnitude": 31.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "2001/01/04 17:00:40.20",
+        "Latitude": 34.1389999999999,
+        "Longitude": 68.503,
+        "Depth": 31,
+        "Magnitude": 32.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "2002/01/04 17:00:40.20",
+        "Latitude": 38.1389999999999,
+        "Longitude": 76.503,
+        "Depth": 31,
+        "Magnitude": 33.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "2003/01/04 17:00:40.20",
+        "Latitude": 42.1389999999999,
+        "Longitude": 84.503,
+        "Depth": 31,
+        "Magnitude": 34.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "2004/01/04 17:00:40.20",
+        "Latitude": 46.1389999999999,
+        "Longitude": 92.503,
+        "Depth": 31,
+        "Magnitude": 35.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "2005/01/04 17:00:40.20",
+        "Latitude": 50.1389999999999,
+        "Longitude": 100.503,
+        "Depth": 31,
+        "Magnitude": 36.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "2006/01/04 17:00:40.20",
+        "Latitude": 54.1389999999999,
+        "Longitude": 108.503,
+        "Depth": 31,
+        "Magnitude": 37.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "2007/01/04 17:00:40.20",
+        "Latitude": 58.1389999999999,
+        "Longitude": 116.503,
+        "Depth": 31,
+        "Magnitude": 38.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "2008/01/04 17:00:40.20",
+        "Latitude": 62.1389999999999,
+        "Longitude": 124.503,
+        "Depth": 31,
+        "Magnitude": 39.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "2009/01/04 17:00:40.20",
+        "Latitude": 66.1389999999999,
+        "Longitude": 132.503,
+        "Depth": 31,
+        "Magnitude": 40.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "2010/01/04 17:00:40.20",
+        "Latitude": 70.1389999999999,
+        "Longitude": 140.503,
+        "Depth": 31,
+        "Magnitude": 41.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "2011/01/04 17:00:40.20",
+        "Latitude": 74.1389999999999,
+        "Longitude": 148.503,
+        "Depth": 31,
+        "Magnitude": 42.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "2012/01/04 17:00:40.20",
+        "Latitude": 78.1389999999999,
+        "Longitude": 156.503,
+        "Depth": 31,
+        "Magnitude": 43.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "2013/01/04 17:00:40.20",
+        "Latitude": 82.1389999999999,
+        "Longitude": 164.503,
+        "Depth": 31,
+        "Magnitude": 44.5,
+        "MagType": "Ms"
+    },
+    {
+        "DateTime": "2014/01/04 17:00:40.20",
+        "Latitude": 86.1389999999999,
+        "Longitude": 172.503,
+        "Depth": 31,
+        "Magnitude": 45.5,
+        "MagType": "Ms"
+    }
+]
