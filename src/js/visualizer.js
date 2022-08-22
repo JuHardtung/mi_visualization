@@ -46,7 +46,7 @@ var zoom = d3
   .on("zoom", zooming);
 
 //define earthquake color range
-var eqColor = d3
+/* var eqColor = d3
   .scaleQuantize()
   .range([
     "#ffffcc",
@@ -58,7 +58,11 @@ var eqColor = d3
     "#e31a1c",
     "#bd0026",
     "#800026",
-  ]);
+  ]); */
+
+var eqColor = d3
+  .scaleQuantize()
+  .range(["#FFEA00", "#F3C316", "#CE5200", "#DF0000", "#9B0404"]);
 
 //create elements in DOM
 var svg = d3.select("svg").attr("width", WIDTH).attr("height", HEIGHT);
@@ -205,9 +209,6 @@ d3.json("./../data/ne_110m_admin_0_countries.geojson").then(function (countriesJ
 
 //enter earthquake circles
 function enterEqCircles(data) {
-  //set color domain for earthquake circles
-  eqColor.domain([d3.min(data, (d) => d.Magnitude), d3.max(data, (d) => d.Magnitude)]);
-
   //set radius domain for earthquake circles
   EQ_SCALE = d3
     .scalePow()
@@ -273,8 +274,8 @@ function exitEqCircles(data) {
 
 //update and transition earthquake circles after data updates
 function updateEqCircles(data) {
-  //set color domain for earthquake circles
-  eqColor.domain([d3.min(data, (d) => d.Magnitude), d3.max(data, (d) => d.Magnitude)]);
+  /*   //set color domain for earthquake circles
+  eqColor.domain([d3.min(data, (d) => d.Magnitude), d3.max(data, (d) => d.Magnitude)]); */
 
   svg
     .selectAll("circle")
