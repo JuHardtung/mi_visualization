@@ -24,6 +24,28 @@
     </div>
     <svg></svg>
     <div id="yearlyEqContainer">
+      <div id="magnitudeFilter">
+        <label class="cbContainer">
+          <input id="magn1" type="checkbox" checked onclick="filterMagnitude()">
+          <span class="checkmark"></span>
+         min. - 4.0
+        </label>
+        <label class="cbContainer">
+          <input id="magn2" type="checkbox" checked onclick="filterMagnitude()">
+          <span class="checkmark"></span>
+          4.0 - 5.0
+        </label>
+        <label class="cbContainer">
+          <input id="magn3" type="checkbox" checked onclick="filterMagnitude()">
+          <span class="checkmark"></span>
+          5.0 - 6.0
+        </label>
+        <label class="cbContainer">
+          <input id="magn4" type="checkbox" checked onclick="filterMagnitude()">
+          <span class="checkmark"></span>
+          6.0 - max
+        </label>
+      </div>
       <svg id="yearlyEqChart"></svg>
     </div>
     <button type="button" onclick="resetView()">Reset View</button>

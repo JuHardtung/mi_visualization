@@ -68,7 +68,7 @@ var map = svg
   .call(zoom)
   .call(zoom.transform, d3.zoomIdentity.translate(WIDTH / 2, HEIGHT / 2).scale(0.0793));
 
-//worldmap with earthquakes + strom data
+//worldmap with earthquakes + storm data
 var oceans = map.append("g").attr("id", "oceans");
 var countries = map.append("g").attr("id", "countries");
 var tecPlates = map.append("g").attr("id", "tectonicPlates");
@@ -77,12 +77,23 @@ var eq = map.append("g").attr("id", "earthquakes");
 //chart for displaying yearly earthquakes
 d3.select("#yearlyEqContainer")
   .attr("width", WIDTH)
-  .attr("height", HEIGHT / 3);
+  .attr("height", HEIGHT / 2);
 
-var yearlyEQS = d3
+var yearlyEqSvg = d3
   .select("#yearlyEqChart")
   .attr("width", WIDTH)
-  .attr("height", HEIGHT / 3);
+  .attr("height", HEIGHT / 2);
+
+//init rangeSlider for filtering yearly earthquakes
+//default range -> 1999-2002
+var slider = createD3RangeSlider(1970, 2014, "#yearlyEqContainer");
+slider.range(START_YEAR, END_YEAR);
+
+//define xScale
+var xScale = d3.scaleBand().range([MARGIN, WIDTH - 15]);
+
+//define yScale
+var yScale = d3.scaleLinear().range([HEIGHT / 2 - MARGIN, 5]);
 
 //load .geojson-files of countries
 d3.json("./../data/ne_110m_admin_0_countries.geojson").then(function (countriesJSON) {
@@ -110,6 +121,12 @@ d3.json("./../data/ne_110m_admin_0_countries.geojson").then(function (countriesJ
     //render tectonic plate borders
     renderTecPlates();
 
+    //set color domain for earthquake circles
+    eqColor.domain([
+      d3.min(earthquakes, (d) => d.Magnitude),
+      d3.max(earthquakes, (d) => d.Magnitude),
+    ]);
+
     // New select element for allowing the user to select a group!
     var filteredEqData = getFilteredEqData(earthquakes, START_YEAR, END_YEAR);
 
@@ -118,18 +135,73 @@ d3.json("./../data/ne_110m_admin_0_countries.geojson").then(function (countriesJ
 
     //render the yearly earthquakes chart
     renderYearlyEarthquakes(earthquakes);
+
+    //onChange listener for the range slider
+    slider.onChange(function (newRange) {
+      var filteredData = getFilteredYearlyEqData(earthquakes);
+      var groupData = getFilteredEqData(filteredData, newRange.begin, newRange.end);
+
+      updateEqCircles(groupData);
+      enterEqCircles(groupData);
+      exitEqCircles(groupData);
+    });
+
+    var magnFilter = document.querySelector("#magnitudeFilter");
+
+    //onChange listener for the magnitude filter
+    magnFilter.addEventListener("change", function (event) {
+      var filteredData = getFilteredYearlyEqData(earthquakes);
+      var yearlyEq = countYearlyEqs(filteredData);
+      var parseTime = d3.timeParse("%Y");
+
+      //parse years from Int to Time
+      yearlyEq.forEach(function (d) {
+        d.year = parseTime(d.year);
+      });
+
+      var stack = d3.stack().keys(["one", "two", "three", "four"]);
+      var filteredSeries = stack(yearlyEq);
+
+      //update yScale
+      yScale.domain([0, d3.max(yearlyEq, (d) => d.one + d.two + d.three + d.four + 5)]);
+
+      //update Y axis
+      yearlyEqSvg
+        .select(".yAxis")
+        .transition()
+        .call(d3.axisLeft(yScale).ticks(5).tickSizeOuter(0));
+
+
+      updateYearlyEqBars(filteredSeries);
+      enterYearlyEqBars(filteredSeries);
+      exitYearlyEqBars(filteredSeries);
+
+
+      var groupData = getFilteredEqData(
+        filteredData,
+        slider.range().begin,
+        slider.range().end
+      );
+
+      updateEqCircles(groupData);
+      enterEqCircles(groupData);
+      exitEqCircles(groupData);
+    });
+
+    //Trendline for yearly earthquakes
+    var trendlineCB = document.querySelector("#renderTrendline");
+
+    //onChange listener for the trendline checkbox
+    trendlineCB.addEventListener("change", function (event) {
+      var filteredData = getFilteredYearlyEqData(earthquakes);
+      var yearlyEq = countYearlyEqs(filteredData);
+      var stack = d3.stack().keys(["one", "two", "three", "four"]);
+      var filteredSeries = stack(yearlyEq);
+
+      renderTrendline(filteredSeries);
+    });
   });
 });
-
-//filter earthquake data
-//returns only the earthquakes that ocurred between range1 and range2
-function getFilteredEqData(data, range1, range2) {
-  return d3.filter(data, function (point) {
-    return (
-      point.DateTime.substring(0, 4) >= range1 && point.DateTime.substring(0, 4) <= range2
-    );
-  });
-}
 
 //enter earthquake circles
 function enterEqCircles(data) {
@@ -219,33 +291,9 @@ function updateEqCircles(data) {
 
 //render the chart of yearly earthquakes
 function renderYearlyEarthquakes(earthquakes) {
-  var yearlyEq = [];
+  var filteredData = getFilteredYearlyEqData(earthquakes);
+  var yearlyEq = countYearlyEqs(filteredData);
   var parseTime = d3.timeParse("%Y");
-
-  //calculate the amount of earthquakes for each year
-  for (var i = 0; i < earthquakes.length; i++) {
-    var year = earthquakes[i].DateTime.substring(0, 4);
-    if (yearlyEq.length == 0) {
-      yearlyEq.push({
-        year: year,
-        count: 1,
-      });
-    }
-
-    var notExisting = true;
-    for (var j = 0; j < yearlyEq.length; j++) {
-      if (yearlyEq[j].year == year) {
-        yearlyEq[j].count += 1;
-        notExisting = false;
-      }
-    }
-    if (notExisting) {
-      yearlyEq.push({
-        year: year,
-        count: 1,
-      });
-    }
-  }
 
   //parse years from Int to Time
   yearlyEq.forEach(function (d) {
@@ -253,16 +301,15 @@ function renderYearlyEarthquakes(earthquakes) {
   });
 
   //define xScale
-  var xScale = d3
-    .scaleTime()
-    .domain([d3.min(yearlyEq, (d) => d.year), d3.max(yearlyEq, (d) => d.year)])
-    .range([MARGIN, WIDTH - 15]);
+  xScale.domain(d3.range(yearlyEq.length));
 
   //define yScale
-  var yScale = d3
-    .scaleLinear()
-    .domain([0, d3.max(yearlyEq, (d) => d.count) + 10])
-    .range([HEIGHT / 3 - MARGIN, 0]);
+  yScale.domain([0, d3.max(yearlyEq, (d) => d.one + d.two + d.three + d.four + 5)]);
+
+  var stack = d3.stack().keys(["one", "two", "three", "four"]);
+  var series = stack(yearlyEq);
+
+  enterYearlyEqBars(series);
 
   //create X axis
   var xAxis = yearlyEQS
@@ -282,18 +329,71 @@ function renderYearlyEarthquakes(earthquakes) {
   xAxis.selectAll(".tick line").attr("y2", 10);
   xAxis.selectAll(".tick text").attr("y", 13);
 
-  //display the yearly amount of earthquakes
-  yearlyEQS
+function enterYearlyEqBars(series) {
+  //Easy colors accessible via a 10-step ordinal scale
+  /* var colors = d3.scaleOrdinal(d3.schemeCategory10); */
+  var colors = d3.scaleLinear().domain([0, 4]).range(["yellow", "red"]);
+
+  // Add a group for each row of data
+  var bars = yearlyEqSvg
+    .selectAll("g")
+    .data(series)
+    .enter()
     .append("g")
     .attr("class", "bars")
+    .style("fill", function (d, i) {
+      console.log(d[0].data);
+      return colors(i);
+    });
+
+  //display the yearly amount of earthquakes
+  bars
     .selectAll("rect")
-    .data(yearlyEq, (d) => d.count)
+    .data((d) => d)
     .enter()
     .append("rect")
-    .attr("x", (d) => xScale(d.year))
-    .attr("y", (d) => yScale(d.count))
+    .attr("x", function (d, i) {
+      return xScale(i);
+    })
+    .attr("y", function (d) {
+      return yScale(d[1]);
+    })
     .attr("width", 5)
-    .attr("height", (d) => HEIGHT / 3 - MARGIN - yScale(d.count));
+    .attr("height", function (d) {
+      return yScale(d[0]) - yScale(d[1]);
+    });
+
+}
+
+//remove circles without data bound to them
+function exitYearlyEqBars(series) {
+  yearlyEqSvg.selectAll("bar").data(series).exit().remove();
+}
+
+//update and transition earthquake circles after data updates
+function updateYearlyEqBars(series) {
+  // Add a group for each row of data
+  var bars = yearlyEqSvg.selectAll("g").data(series);
+
+  //display the yearly amount of earthquakes
+  bars
+    .selectAll("rect")
+    .data(function (d) {
+      return d;
+    })
+    .transition()
+    .attr("x", function (d, i) {
+      return xScale(i);
+    })
+    .attr("y", function (d) {
+      return yScale(d[1]);
+    })
+    .attr("width", 5)
+    .attr("height", function (d) {
+      return yScale(d[0]) - yScale(d[1]);
+    });
+}
+
 
   //init rangeSlider for filtering yearly earthquakes
   //default range -> 1999-2002
@@ -307,7 +407,77 @@ function renderYearlyEarthquakes(earthquakes) {
     updateEqCircles(groupData);
     enterEqCircles(groupData);
     exitEqCircles(groupData);
+//filter earthquake data
+//returns only the earthquakes that ocurred between range1 and range2
+function getFilteredEqData(data, range1, range2) {
+  return d3.filter(data, function (point) {
+    return (
+      point.DateTime.substring(0, 4) >= range1 && point.DateTime.substring(0, 4) <= range2
+    );
   });
+}
+
+//filter earthquake data
+//returns only the earthquakes that ocurred between range1 and range2
+function getFilteredYearlyEqData(data) {
+  var magn1 = document.querySelector("#magn1");
+  var magn2 = document.querySelector("#magn2");
+  var magn3 = document.querySelector("#magn3");
+  var magn4 = document.querySelector("#magn4");
+
+  return d3.filter(data, function (point) {
+    return (
+      (magn1.checked && point.Magnitude <= 6.0) ||
+      (magn2.checked && point.Magnitude > 6.0 && point.Magnitude <= 7.0) ||
+      (magn3.checked && point.Magnitude > 7.0 && point.Magnitude <= 8.0) ||
+      (magn4.checked && point.Magnitude > 8.0)
+    );
+  });
+}
+
+//counts how many earthquakes have happened every year
+function countYearlyEqs(earthquakes) {
+  var yearlyEq = [];
+
+  //create one entry for each years
+  for (var year = 1970; year <= 2013; year++) {
+    yearlyEq.push({ one: 0, two: 0, three: 0, four: 0, year: year });
+  }
+
+  //count the amount of earthquakes for each year
+  for (var i = 0; i < earthquakes.length; i++) {
+    var year = earthquakes[i].DateTime.substring(0, 4);
+    var cat = checkEqCategorie(earthquakes[i].Magnitude);
+
+    for (var j = 0; j < yearlyEq.length; j++) {
+      if (1970 + j == year) {
+        if (cat == 1) {
+          yearlyEq[j].one += 1;
+        } else if (cat == 2) {
+          yearlyEq[j].two += 1;
+        } else if (cat == 3) {
+          yearlyEq[j].three += 1;
+        } else if (cat == 4) {
+          yearlyEq[j].four += 1;
+        }
+      }
+    }
+  }
+
+  return yearlyEq;
+}
+
+function checkEqCategorie(magnitude) {
+  if (magnitude <= 6.0) {
+    return 1;
+  } else if (magnitude > 6.0 && magnitude <= 7.0) {
+    return 2;
+  } else if (magnitude > 7.0 && magnitude <= 8.0) {
+    return 3;
+  } else if (magnitude > 8.0) {
+    return 4;
+  }
+  console.error("no magnitude categorie found");
 }
 
 //render boundaries and labels of tectonic plates
@@ -349,6 +519,13 @@ function renderTecPlates() {
       tecPlates.selectAll("text").data(tecPlatesJSON).exit().remove();
     }
   });
+}
+
+function filterMagnitude() {
+  var magn1 = document.querySelector("#magn1");
+  var magn2 = document.querySelector("#magn2");
+  var magn3 = document.querySelector("#magn3");
+  var magn4 = document.querySelector("#magn4");
 }
 
 //resets the map zoom and translation to the default values
