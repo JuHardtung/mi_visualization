@@ -233,14 +233,14 @@ function enterEqCircles(data) {
       var latitude = Math.round(d3.select(this).attr("lat") * 100, 2) / 100;
       var longitude = Math.round(d3.select(this).attr("long") * 100, 2) / 100;
 
-      //get x and y of circle for tooltip
-      var eqCx = parseInt(d3.select(this).attr("cx"));
-      var eqCy = parseInt(d3.select(this).attr("cy"));
+      //get x and y of mouse for tooltip
+      var mx = parseInt(event.x);
+      var my = parseInt(event.y);
 
       //setup earthquake tooltip
       d3.select("#earthquakeTooltip")
-        .style("left", eqCx + 100 + "px")
-        .style("top", eqCy + 30 + "px")
+        .style("left", mx + 10 + "px")
+        .style("top", my + 10 + "px")
         .select("#magnitude")
         .text(magnitude);
 
