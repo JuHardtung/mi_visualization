@@ -313,22 +313,32 @@ function renderYearlyEarthquakes(earthquakes) {
   enterYearlyEqBars(series);
 
   //create X axis
-  var xAxis = yearlyEQS
+  yearlyEqSvg
     .append("g")
-    .attr("class", "x axis")
-    .attr("transform", `translate(2.5,${HEIGHT / 3 - MARGIN})`)
-    .call(d3.axisBottom(xScale).ticks(15));
+    .attr("class", "xAxis")
+    .attr("transform", `translate(-8,${HEIGHT / 2 - MARGIN})`)
+    .call(
+      d3
+        .axisBottom(xScale)
+        .tickSizeOuter(0)
+        .tickFormat(function (d) {
+          if (d % 5 == 0) {
+            return d + 1970;
+          }
+        })
+    );
 
   //create Y axis
-  yearlyEQS
+  yearlyEqSvg
     .append("g")
-    .attr("class", "y axis")
+    .attr("class", "yAxis")
     .attr("transform", "translate(" + MARGIN + ",0)")
-    .call(d3.axisLeft(yScale).ticks(5));
+    .call(d3.axisLeft(yScale).ticks(5).tickSizeOuter(0));
 
   //offset for ticks so they don't get obstructed by range slider
-  xAxis.selectAll(".tick line").attr("y2", 10);
-  xAxis.selectAll(".tick text").attr("y", 13);
+  yearlyEqSvg.select(".xAxis").selectAll(".tick line").attr("y2", 13);
+  yearlyEqSvg.select(".xAxis").selectAll(".tick text").attr("y", 15);
+}
 
 function enterYearlyEqBars(series) {
   //Easy colors accessible via a 10-step ordinal scale
