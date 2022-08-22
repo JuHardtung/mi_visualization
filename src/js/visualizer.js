@@ -374,6 +374,7 @@ function enterYearlyEqBars(series) {
       return yScale(d[0]) - yScale(d[1]);
     });
 
+  renderTrendline(series);
 }
 
 //remove circles without data bound to them
@@ -405,19 +406,55 @@ function updateYearlyEqBars(series) {
     });
 }
 
+function renderTrendline(series) {
+  var trendlineCB = document.querySelector("#renderTrendline");
 
-  //init rangeSlider for filtering yearly earthquakes
-  //default range -> 1999-2002
-  var slider = createD3RangeSlider(1970, 2014, "#yearlyEqContainer");
-  slider.range(START_YEAR, END_YEAR);
+  // get the x and y values for least squares
+  var xSeries = d3.range(0, series[3].length);
+  console.log("~ xSeries", xSeries);
+  var ySeries = [];
 
-  //onChange listener for the range slider
-  slider.onChange(function (newRange) {
-    var groupData = getFilteredEqData(earthquakes, newRange.begin, newRange.end);
+  for (var i = 0; i < series[3].length; i++) {
+    ySeries.push(series[3][i][1]);
+  }
 
-    updateEqCircles(groupData);
-    enterEqCircles(groupData);
-    exitEqCircles(groupData);
+  var leastSquaresCoeff = leastSquares(xSeries, ySeries);
+
+  // apply the reults of the least squares regression
+  var x1 = xSeries[0];
+  var y1 = leastSquaresCoeff[0] + leastSquaresCoeff[1];
+  var x2 = xSeries[xSeries.length - 1];
+  var y2 = leastSquaresCoeff[0] * xSeries.length + leastSquaresCoeff[1];
+  var trendData = [[x1, y1, x2, y2]];
+
+  var trendline = yearlyEqSvg.selectAll(".trendline").data(trendData);
+
+  if (trendlineCB.checked) {
+    trendline
+      .enter()
+      .append("line")
+      .attr("class", "trendline")
+      .attr("x1", function (d) {
+        return xScale(d[0]);
+      })
+      .attr("y1", function (d) {
+        return yScale(d[1]);
+      })
+      .attr("x2", function (d) {
+        console.log("~ xScale(d[2])", d[2]);
+
+        return xScale(d[2]);
+      })
+      .attr("y2", function (d) {
+        return yScale(d[3]);
+      })
+      .attr("stroke", "black")
+      .attr("stroke-width", 1);
+  } else {
+    yearlyEqSvg.select(".trendline").remove();
+  }
+}
+
 //filter earthquake data
 //returns only the earthquakes that ocurred between range1 and range2
 function getFilteredEqData(data, range1, range2) {
@@ -541,8 +578,39 @@ function filterMagnitude() {
 
 //resets the map zoom and translation to the default values
 function resetView() {
-  map.call(
-    zoom.transform,
-    d3.zoomIdentity.translate(WIDTH / 2, HEIGHT / 2).scale(0.0793)
-  );
+  map.call(zoom.transform, d3.zoomIdentity.translate(WIDTH / 2, HEIGHT / 2).scale(0.0793));
+}
+
+// returns slope, intercept and r-square of the line
+function leastSquares(xSeries, ySeries) {
+  var reduceSumFunc = function (prev, cur) {
+    return prev + cur;
+  };
+
+  var xBar = (xSeries.reduce(reduceSumFunc) * 1.0) / xSeries.length;
+  var yBar = (ySeries.reduce(reduceSumFunc) * 1.0) / ySeries.length;
+
+  var ssXX = xSeries
+    .map(function (d) {
+      return Math.pow(d - xBar, 2);
+    })
+    .reduce(reduceSumFunc);
+
+  var ssYY = ySeries
+    .map(function (d) {
+      return Math.pow(d - yBar, 2);
+    })
+    .reduce(reduceSumFunc);
+
+  var ssXY = xSeries
+    .map(function (d, i) {
+      return (d - xBar) * (ySeries[i] - yBar);
+    })
+    .reduce(reduceSumFunc);
+
+  var slope = ssXY / ssXX;
+  var intercept = yBar - xBar * slope;
+  var rSquare = Math.pow(ssXY, 2) / (ssXX * ssYY);
+
+  return [slope, intercept, rSquare];
 }
