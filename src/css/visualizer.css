@@ -84,3 +84,94 @@ label, .label {
   top: 50%;
   margin-top: -4px;
 }
+
+#settingsContainer {
+  display: flex;
+}
+
+button {
+  vertical-align: top;
+  background-color: white;
+  border: 1px solid lightgrey;
+  border-radius: 5px;
+  padding: 3px;
+  margin: 4px;
+  /* display: inline-flex; */
+  align-items: center;
+  cursor: pointer;
+  height: 38px;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 18px;
+}
+
+button:hover {
+ background-color: #ccc;
+}
+
+#magnitudeFilter {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem;
+}
+
+.cbContainer {
+  display: inline-flex;
+  border: 1px solid lightgrey;
+  border-radius: 5px;
+  padding: 3px;
+  margin: 4px;
+  align-items: center;
+  cursor: pointer;
+  font-size: 16px;
+  user-select: none;
+}
+
+.cbContainer input {
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  margin: 5px 5px 5px 0px;
+  height: 20px;
+  width: 20px;
+  background-color: #eee;
+}
+
+/* On mouse-over, add a grey background color */
+.cbContainer:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.cbContainer input:checked ~ .checkmark {
+  background-color: #2196F3;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: relative;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.cbContainer input:checked ~ .checkmark:after {
+  display: flex;
+}
+
+/* Style the checkmark/indicator */
+.cbContainer .checkmark:after {
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+}
