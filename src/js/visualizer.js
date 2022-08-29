@@ -45,25 +45,6 @@ var zoom = d3
   ])
   .on("zoom", zooming);
 
-//define earthquake color range
-/* var eqColor = d3
-  .scaleQuantize()
-  .range([
-    "#ffffcc",
-    "#ffeda0",
-    "#fed976",
-    "#feb24c",
-    "#fd8d3c",
-    "#fc4e2a",
-    "#e31a1c",
-    "#bd0026",
-    "#800026",
-  ]); */
-
-var eqColor = d3
-  .scaleQuantize()
-  .range(["#FFEA00", "#F3C316", "#CE5200", "#DF0000", "#9B0404"]);
-
 //create elements in DOM
 var svg = d3.select("svg").attr("width", WIDTH).attr("height", HEIGHT);
 var map = svg
@@ -124,12 +105,6 @@ d3.json("./../data/ne_110m_admin_0_countries.geojson").then(function (countriesJ
 
     //render tectonic plate borders
     renderTecPlates();
-
-    //set color domain for earthquake circles
-    eqColor.domain([
-      d3.min(earthquakes, (d) => d.Magnitude),
-      d3.max(earthquakes, (d) => d.Magnitude),
-    ]);
 
     // New select element for allowing the user to select a group!
     var filteredEqData = getFilteredEqData(earthquakes, START_YEAR, END_YEAR);
@@ -226,7 +201,9 @@ function enterEqCircles(data) {
     .attr("cx", (d) => projection([d.Longitude, d.Latitude])[0])
     .attr("cy", (d) => projection([d.Longitude, d.Latitude])[1])
     .attr("r", (d) => EQ_SCALE(d.Magnitude))
-    .attr("fill", (d) => eqColor(d.Magnitude))
+    .attr("fill", function (d) {
+      return getMagnitudeColor(d.Magnitude);
+    })
     .on("mouseover", function (event, d) {
       //get information for tooltip
       var magnitude = d3.select(this).attr("magnitude");
@@ -259,7 +236,6 @@ function enterEqCircles(data) {
       //resize earthquake circle
       d3.select(this)
         .transition()
-        .attr("fill", (d) => eqColor(d.Magnitude))
         .attr("r", (d) => EQ_SCALE(d.Magnitude));
 
       //hide tooltip
@@ -274,8 +250,6 @@ function exitEqCircles(data) {
 
 //update and transition earthquake circles after data updates
 function updateEqCircles(data) {
-  /*   //set color domain for earthquake circles
-  eqColor.domain([d3.min(data, (d) => d.Magnitude), d3.max(data, (d) => d.Magnitude)]); */
 
   svg
     .selectAll("circle")
@@ -287,7 +261,9 @@ function updateEqCircles(data) {
     .attr("cx", (d) => projection([d.Longitude, d.Latitude])[0])
     .attr("cy", (d) => projection([d.Longitude, d.Latitude])[1])
     .attr("r", (d) => EQ_SCALE(d.Magnitude))
-    .attr("fill", (d) => eqColor(d.Magnitude));
+    .attr("fill", function (d) {      
+      return getMagnitudeColor(d.Magnitude);
+    });
 }
 
 //render the chart of yearly earthquakes
@@ -341,9 +317,6 @@ function renderYearlyEarthquakes(earthquakes) {
 }
 
 function enterYearlyEqBars(series) {
-  //Easy colors accessible via a 10-step ordinal scale
-  /* var colors = d3.scaleOrdinal(d3.schemeCategory10); */
-  var colors = d3.scaleLinear().domain([0, 4]).range(["yellow", "red"]);
 
   // Add a group for each row of data
   var bars = yearlyEqSvg
@@ -353,8 +326,15 @@ function enterYearlyEqBars(series) {
     .append("g")
     .attr("class", "bars")
     .style("fill", function (d, i) {
-      console.log(d[0].data);
-      return colors(i);
+      if (i == 0) {
+        return "#fdfa26";
+      } else if (i == 1) {
+        return "#ff9e00";
+      } else if (i == 2) {
+        return "#ff0000";
+      } else if (i == 3) {
+        return "#380000";
+      }
     });
 
   //display the yearly amount of earthquakes
@@ -411,7 +391,6 @@ function renderTrendline(series) {
 
   // get the x and y values for least squares
   var xSeries = d3.range(0, series[3].length);
-  console.log("~ xSeries", xSeries);
   var ySeries = [];
 
   for (var i = 0; i < series[3].length; i++) {
@@ -441,8 +420,6 @@ function renderTrendline(series) {
         return yScale(d[1]);
       })
       .attr("x2", function (d) {
-        console.log("~ xScale(d[2])", d[2]);
-
         return xScale(d[2]);
       })
       .attr("y2", function (d) {
@@ -569,11 +546,16 @@ function renderTecPlates() {
   });
 }
 
-function filterMagnitude() {
-  var magn1 = document.querySelector("#magn1");
-  var magn2 = document.querySelector("#magn2");
-  var magn3 = document.querySelector("#magn3");
-  var magn4 = document.querySelector("#magn4");
+function getMagnitudeColor(magnitude) {
+  if (magnitude <= 6.0) {
+    return "rgb(253, 250, 38, 0.8)";
+  } else if (magnitude >= 6.0 && magnitude <= 7.0) {
+    return "rgb(254, 125, 19, 0.8)";
+  } else if (magnitude >= 7.0 && magnitude <= 8.0) {
+    return "rgb(255, 0, 0, 0.8)";
+  } else if (magnitude >= 8.0) {
+    return "rgb(50, 50, 50, 0.8)";
+  }
 }
 
 //resets the map zoom and translation to the default values
