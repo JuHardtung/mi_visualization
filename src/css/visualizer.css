@@ -41,6 +41,10 @@ label, .label {
 /* Yearly earthquake chart/slider */
 #yearlyEqContainer {
   margin: 1rem;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 18px;
 }
 
 .slider-container {
@@ -112,19 +116,32 @@ button:hover {
 
 #magnitudeFilter {
   display: flex;
+  margin: auto;
   justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-size: 16px;
+  width: 450px;
+  border: 1px solid lightgrey;
+  border-bottom: none;
+  padding: 0.5rem;
+  transform: translate(0px, 26px);
+}
+
+#magnitudeFilterCbs {
+  display: flex;
   padding: 0.5rem;
 }
 
 .cbContainer {
-  display: inline-flex;
+  display: flex;
   border: 1px solid lightgrey;
   border-radius: 5px;
   padding: 3px;
   margin: 4px;
   align-items: center;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
   user-select: none;
 }
 
@@ -133,6 +150,22 @@ button:hover {
   cursor: pointer;
   height: 0;
   width: 0;
+}
+
+#filterToggle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70px;
+  margin: auto;
+  padding: 4px;
+  cursor: pointer;
+  transform: translate(0px, 25px);
+  background-color: rgb(233, 233, 233);
+}
+
+#filterToggle:hover {
+background-color: rgb(204, 204, 204);
 }
 
 /* Create a custom checkbox */

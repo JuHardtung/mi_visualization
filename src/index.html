@@ -10,6 +10,7 @@
     <script src="https://rawgit.com/MasterMaps/d3-slider/master/d3.slider.js"></script>
     <script src="js/rangeSlider.js" defer></script>
     <script src="js/visualizer.js" defer></script>
+    <script src="js/helper.js" defer></script>
 
     <title>Hurricane Visualizer</title>
   </head>
@@ -25,6 +26,8 @@
     <svg></svg>
     <div id="yearlyEqContainer">
       <div id="magnitudeFilter">
+        Magnitude Categorie Filter
+        <div id="magnitudeFilterCbs">
         <label class="cbContainer">
           <input id="magn1" type="checkbox" checked onclick="filterMagnitude()">
           <span class="checkmark"></span>
@@ -46,6 +49,8 @@
           6.0 - max
         </label>
       </div>
+      </div>
+      <div id="filterToggle" onclick="toogleEarthquakeFilter()">Filter</div>
       <svg id="yearlyEqChart"></svg>
     </div>
     <div id="settingsContainer">
