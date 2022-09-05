@@ -52,6 +52,16 @@
       </div>
       <div id="filterToggle" onclick="toogleEarthquakeFilter()">Filter</div>
       <svg id="yearlyEqChart"></svg>
+      <div id="yearlyEqTooltip" class="hidden">
+        <p>
+          Earthquakes in <strong><span id="eqYear"></span></strong>:
+        </p>
+        <p>8.0+: <span id="eqCat4"></span></p>
+        <p>7.0-8.0: <span id="eqCat3"></span></p>
+        <p>6.0-7.0+: <span id="eqCat2"></span></p>
+        <p>6.0-: <span id="eqCat1"></span></p>
+
+      </div>
     </div>
     <div id="settingsContainer">
       <button type="button" onclick="resetView()">Reset View</button>

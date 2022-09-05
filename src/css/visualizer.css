@@ -7,7 +7,8 @@ svg {
 
 /* TOOLTIPS */
 #countryTooltip,
-#earthquakeTooltip {
+#earthquakeTooltip,
+#yearlyEqTooltip {
   position: absolute;
   width: auto;
   height: auto;
@@ -19,12 +20,14 @@ svg {
 }
 
 #countryTooltip.hidden,
-#earthquakeTooltip.hidden {
+#earthquakeTooltip.hidden,
+#yearlyEqTooltip.hidden {
   display: none;
 }
 
 #countryTooltip p,
-#earthquakeTooltip p {
+#earthquakeTooltip p,
+#yearlyEqTooltip p {
   margin: 0;
   font-family: sans-serif;
   font-size: 14px;

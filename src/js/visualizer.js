@@ -292,16 +292,15 @@ function renderYearlyEarthquakes(earthquakes) {
   yearlyEqSvg
     .append("g")
     .attr("class", "xAxis")
-    .attr("transform", `translate(-8,${HEIGHT / 2 - MARGIN})`)
+    .attr("transform", `translate(0,${HEIGHT / 2 - MARGIN})`)
     .call(
-      d3
-        .axisBottom(xScale)
-        .tickSizeOuter(0)
-        .tickFormat(function (d) {
-          if (d % 5 == 0) {
-            return d + 1970;
-          }
-        })
+      d3.axisBottom(xScale)
+      .tickSizeOuter(0)
+      .tickFormat(function (d) {
+        if (d % 5 == 0) {
+          return d + 1970;
+        }
+      })
     );
 
   //create Y axis
@@ -317,7 +316,6 @@ function renderYearlyEarthquakes(earthquakes) {
 }
 
 function enterYearlyEqBars(series) {
-
   // Add a group for each row of data
   var bars = yearlyEqSvg
     .selectAll("g")
@@ -343,15 +341,66 @@ function enterYearlyEqBars(series) {
     .data((d) => d)
     .enter()
     .append("rect")
+    .attr("class", function (d) {
+      return "eq" + d.data.year.getFullYear();
+    })
+    .attr("count", (d) => d[1] - d[0])
     .attr("x", function (d, i) {
-      return xScale(i);
+      return xScale(i) + 7;
     })
     .attr("y", function (d) {
       return yScale(d[1]);
     })
-    .attr("width", 5)
+    .attr("width", 8)
     .attr("height", function (d) {
       return yScale(d[0]) - yScale(d[1]);
+    })
+    .on("mouseover", function (event, d) {
+
+      //get information for tooltip
+      var year = d3.select(this).attr("class");
+
+      var barCategories = document.getElementsByClassName(year);
+      var eqCat1 = barCategories[0].attributes[1].value;
+      var eqCat2 = barCategories[1].attributes[1].value;
+      var eqCat3 = barCategories[2].attributes[1].value;
+      var eqCat4 = barCategories[3].attributes[1].value;
+
+      //get x and y of mouse for tooltip
+      var mx = parseInt(event.clientX);
+      var my = parseInt(event.screenY);
+
+      //setup earthquake tooltip
+      d3.select("#yearlyEqTooltip")
+        .style("left", mx + 10 + "px")
+        .style("top", my + "px")
+        .select("#eqYear")
+        .text(year.substring(2, 6));
+
+      //set earthquake tooltip data
+      d3.select("#yearlyEqTooltip").select("#eqCat1").text(eqCat1);
+      d3.select("#yearlyEqTooltip").select("#eqCat2").text(eqCat2);
+      d3.select("#yearlyEqTooltip").select("#eqCat3").text(eqCat3);
+      d3.select("#yearlyEqTooltip").select("#eqCat4").text(eqCat4);
+      d3.select("#yearlyEqTooltip").classed("hidden", false);
+
+      //resize earthquake bar
+      d3.select("#yearlyEqChart")
+        .selectAll("." + year)
+        .transition()
+        .attr("width", 12);
+    })
+    .on("mouseout", function (d) {
+      var year = d3.select(this).attr("class");
+
+      //resize earthquake bars
+      d3.select("#yearlyEqChart")
+        .selectAll("." + year)
+        .transition()
+        .attr("width", 8);
+
+      //hide tooltip
+      d3.select("#yearlyEqTooltip").classed("hidden", true);
     });
 
   renderTrendline(series);
@@ -380,12 +429,14 @@ function updateYearlyEqBars(series) {
     .attr("y", function (d) {
       return yScale(d[1]);
     })
-    .attr("width", 5)
+    .attr("width", 8)
     .attr("height", function (d) {
       return yScale(d[0]) - yScale(d[1]);
     });
 }
 
+
+//TODO: update trendline when filtering out certain earthquake magnitudes
 function renderTrendline(series) {
   var trendlineCB = document.querySelector("#renderTrendline");
 
@@ -460,13 +511,13 @@ function getFilteredYearlyEqData(data) {
   });
 }
 
-//counts how many earthquakes have happened every year
+//counts how many earthquakes have happened on a given year
 function countYearlyEqs(earthquakes) {
   var yearlyEq = [];
 
   //create one entry for each years
   for (var year = 1970; year <= 2013; year++) {
-    yearlyEq.push({ one: 0, two: 0, three: 0, four: 0, year: year });
+    yearlyEq.push({one: 0, two: 0, three: 0, four: 0, year: year});
   }
 
   //count the amount of earthquakes for each year
