@@ -43,7 +43,6 @@ label, .label {
 
 /* Yearly earthquake chart/slider */
 #yearlyEqContainer {
-  margin: 1rem;
   font-family: sans-serif;
   font-weight: bold;
   font-size: 16px;
@@ -56,7 +55,7 @@ label, .label {
   display: block;
   top: -44.5px;
   left: 6.6px;
-  width: 965px;
+  width: 940px;
 }
 
 .slider {

@@ -71,7 +71,7 @@ var yearlyEqSvg = d3
 
 //init rangeSlider for filtering yearly earthquakes
 //default range -> 1999-2002
-var slider = createD3RangeSlider(1970, 2014, "#yearlyEqContainer");
+var slider = createD3RangeSlider(1970, 2013, "#yearlyEqContainer");
 slider.range(START_YEAR, END_YEAR);
 
 //define xScale
@@ -154,7 +154,6 @@ d3.json("./../data/ne_110m_admin_0_countries.geojson").then(function (countriesJ
       updateYearlyEqBars(filteredSeries);
       enterYearlyEqBars(filteredSeries);
       exitYearlyEqBars(filteredSeries);
-
 
       var groupData = getFilteredEqData(
         filteredData,
@@ -261,7 +260,7 @@ function updateEqCircles(data) {
     .attr("cx", (d) => projection([d.Longitude, d.Latitude])[0])
     .attr("cy", (d) => projection([d.Longitude, d.Latitude])[1])
     .attr("r", (d) => EQ_SCALE(d.Magnitude))
-    .attr("fill", function (d) {      
+    .attr("fill", function (d) {
       return getMagnitudeColor(d.Magnitude);
     });
 }

@@ -115,12 +115,12 @@ function createD3RangeSlider(rangeMin, rangeMax, containerSelector) {
         callback({ begin: sliderRange.begin, end: sliderRange.end });
       });
 
-      var conW = sliderBox.node().clientWidth;        //960 px
-      var curLeft = parseFloat(slider.style("left")); //629.727 px
+      var conW = sliderBox.node().clientWidth;        //940 px
+      var curLeft = parseFloat(slider.style("left")); //633.954 px
       
       var yearGap = sliderRange.end - sliderRange.begin;//2002 - 1999 = 3 years
-      var oneYearWidth = conW / (rangeMax - rangeMin);  //960 / (2014 - 1970) = ~21.81 px
-      var yearGapWidth = yearGap * oneYearWidth;        //3 * 21.81 = ~65.45 px
+      var oneYearWidth = conW / (rangeMax - rangeMin);  //940 / (2013 - 1970) = ~21.86 px
+      var yearGapWidth = yearGap * oneYearWidth;        //3 * 21.84 = ~65.58 px
       
       var newLeftOffset = Math.round(curLeft / oneYearWidth); //29 years
       var newLeft = newLeftOffset * oneYearWidth;             // 632.727 px
@@ -160,16 +160,15 @@ function createD3RangeSlider(rangeMin, rangeMax, containerSelector) {
         callback({ begin: sliderRange.begin, end: sliderRange.end });
       });
 
-      var conW = sliderBox.node().clientWidth;          //960 px
-      var curLeft = parseFloat(slider.style("left"));   //629.727 px
+      var conW = sliderBox.node().clientWidth;          //940 px
+      var curLeft = parseFloat(slider.style("left"));   //633.954 px
       
-      var oneYearWidth = conW / (rangeMax - rangeMin);  //960 / (2014 - 1970) = ~21.81 px
+      var oneYearWidth = conW / (rangeMax - rangeMin);  //940 / (2013 - 1970) = ~21.86 px
       
       var newLeftOffset = Math.round(curLeft / oneYearWidth); //29 years
       var newLeft = newLeftOffset * oneYearWidth;             // 632.727 px
 
       slider.style("left", newLeft + "px");
-
     })
     .on("drag", function (event) {
       var dx = event.dx;
