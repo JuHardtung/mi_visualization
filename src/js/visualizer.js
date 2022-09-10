@@ -357,6 +357,7 @@ function enterYearlyEqBars(series) {
 
       //get information for tooltip
       var year = d3.select(this).attr("class");
+      var plainYear = year.substring(2,6);
 
       var barCategories = document.getElementsByClassName(year);
       var eqCat1 = barCategories[0].attributes[1].value;
@@ -365,8 +366,8 @@ function enterYearlyEqBars(series) {
       var eqCat4 = barCategories[3].attributes[1].value;
 
       //get x and y of mouse for tooltip
-      var mx = parseInt(event.clientX);
-      var my = parseInt(event.screenY);
+      var mx = parseInt(event.x);
+      var my = parseInt(event.y);
 
       //setup earthquake tooltip
       d3.select("#yearlyEqTooltip")
@@ -374,6 +375,15 @@ function enterYearlyEqBars(series) {
         .style("top", my + "px")
         .select("#eqYear")
         .text(year.substring(2, 6));
+
+      //mark earthquake circles of marked year
+      d3.select("#earthquakes")
+        .selectAll("circle")
+        .transition()
+        .style("stroke", function(d) {
+          if(d.DateTime.substring(0,4) == plainYear) {
+            return "black";
+          }});
 
       //set earthquake tooltip data
       d3.select("#yearlyEqTooltip").select("#eqCat1").text(eqCat1);
@@ -395,7 +405,13 @@ function enterYearlyEqBars(series) {
       d3.select("#yearlyEqChart")
         .selectAll("." + year)
         .transition()
-        .attr("width", 8);
+        .attr("width", xScale.bandwidth());
+
+      //reet erthquake circle selection
+      d3.select("#earthquakes")
+        .selectAll("circle")
+        .transition()
+        .style("stroke", "none"); 
 
       //hide tooltip
       d3.select("#yearlyEqTooltip").classed("hidden", true);
