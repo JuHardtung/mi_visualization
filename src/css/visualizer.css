@@ -1,6 +1,8 @@
 svg {
     display: block;
+    width: 80%;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+    max-width: 800px;
     margin: auto;
     padding: 0.5rem;
   }
@@ -17,6 +19,7 @@ svg {
   border-radius: 10px;
   box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
   pointer-events: none;
+  z-index: 1;
 }
 
 #countryTooltip.hidden,
@@ -49,13 +52,10 @@ label, .label {
   line-height: 18px;
 }
 
-.slider-container {
-  /* background-color: #f2f2f9; */
+#slider-container {
   margin: auto;
   display: block;
-  top: -44.5px;
-  left: 6.6px;
-  width: 940px;
+  max-width: 760px;
 }
 
 .slider {

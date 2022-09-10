@@ -26,14 +26,31 @@ function createD3RangeSlider(rangeMin, rangeMax, containerSelector) {
   var changeListeners = [];
   var touchEndListeners = [];
   var container = d3.select(containerSelector);
-  var containerHeight = 200;
+  var containerHeight = 20;
+
+  var sliderWidth = getSliderWidth();
+  var sliderOffsetL = getLeftOffset();
+  var sliderTopOffset = getTopOffset();
 
   var sliderBox = container
     .append("div")
     .style("position", "relative")
-    .style("height", containerHeight / 10 + "px")
-    .style("min-width", minWidth * 2 + "px")
-    .classed("slider-container", true);
+    .style("height", containerHeight + "px")
+    .style("width", getSliderWidth() + "px")
+    .style("left", getLeftOffset() + "px")
+    .style("top", getTopOffset() + "px")
+    .attr("id", "slider-container");
+  
+    window.addEventListener("resize", function(event) {
+      var slider = document.getElementById("slider-container");
+      sliderWidth = getSliderWidth();
+      sliderOffsetL = getLeftOffset();
+      sliderTopOffset = getTopOffset();
+
+      slider.style.width = sliderWidth + "px";
+      slider.style.left = sliderOffsetL + "px";
+      slider.style.top = sliderTopOffset + "px";
+    });
 
   //Create elements in container
   var slider = sliderBox.append("div").attr("class", "slider");
@@ -83,8 +100,10 @@ function createD3RangeSlider(rangeMin, rangeMax, containerSelector) {
         callback({ begin: sliderRange.begin, end: sliderRange.end });
       });
 
+      var conW = sliderBox.node().clientWidth; 
       var yearGap = sliderRange.end - sliderRange.begin;
-      var yearGapWidth = (yearGap * sliderBox.node().clientWidth) / 44;
+      var oneYearWidth = conW / (rangeMax - rangeMin);  //940 / (2013 - 1970) = ~21.86 px
+      var yearGapWidth = yearGap * oneYearWidth;        //3 * 21.84 = ~65.58 px
 
       slider.style("width", yearGapWidth + "px");
       updateRangeFromUI();
@@ -92,7 +111,7 @@ function createD3RangeSlider(rangeMin, rangeMax, containerSelector) {
     .on("drag", function (event) {
       var dx = event.dx;
       if (dx == 0) return;
-      var conWidth = sliderBox.node().clientWidth; //parseFloat(container.style("width"));
+      var conWidth = sliderBox.node().clientWidth;
       var newLeft = parseInt(slider.style("left"));
       var newWidth = parseFloat(slider.style("width")) + dx;
 
@@ -290,4 +309,25 @@ function createD3RangeSlider(rangeMin, rangeMax, containerSelector) {
     onTouchEnd: onTouchEnd,
     updateUIFromRange: updateUIFromRange,
   };
+}
+
+function getSliderWidth() {
+  var sliderW =  65 + ((window.innerWidth-100)/100) * 75;
+  
+  return sliderW;
+}
+
+//calculates the left slider offset for dynamic screen sizes
+function getLeftOffset() {
+  return 1 + window.innerWidth/100*0.3;
+}
+
+//calculates the slider top offset for dynamic screen sizes
+function getTopOffset() {
+  var offset = -25 - window.innerWidth/100 *2;
+
+  if (offset < -40 ) {
+    return -40;
+  }
+  return offset;
 }

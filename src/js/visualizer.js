@@ -1,11 +1,38 @@
-var WIDTH = 1000;
-var HEIGHT = 500;
+var SCREEN_WIDTH = window.innerWidth;
+var SCREEN_HEIGHT = window.innerHeight;
+var WIDTH = SCREEN_WIDTH*0.8//1000;
+var HEIGHT = WIDTH/2//500;
 var MARGIN = 25;
 var START_YEAR = 1999;
 var END_YEAR = 2002;
 var NEW_MAP_SCALE;
+var MAP_SCALING = SCREEN_WIDTH*0.000064;
 
 var EQ_SCALE;
+
+//create elements in DOM
+var svg = d3.select("svg")
+        .attr("viewBox", "0 0 " + WIDTH + " " + HEIGHT);
+
+var map = svg
+  .append("g")
+  .attr("id", "map");
+
+//worldmap with earthquakes + storm data
+var oceans = map.append("g").attr("id", "oceans");
+var countries = map.append("g").attr("id", "countries");
+var tecPlates = map.append("g").attr("id", "tectonicPlates");
+var eq = map.append("g").attr("id", "earthquakes");
+
+var yearlyEqSvg = d3
+  .select("#yearlyEqChart")
+  .attr("viewBox", "0 0 " + WIDTH + " " + HEIGHT/2);
+
+//define xScale
+var xScale = d3.scaleBand().range([MARGIN, WIDTH - 15]);
+
+//define yScale
+var yScale = d3.scaleLinear().range([HEIGHT / 2 - MARGIN, 5]);
 
 //define projection and path generator
 var projection = d3.geoEquirectangular().translate([WIDTH / 2, HEIGHT / 2]);
@@ -38,47 +65,19 @@ var zooming = function (event) {
 //define zoom behaviour
 var zoom = d3
   .zoom()
-  .scaleExtent([0.0793, 1])
+  .scaleExtent([MAP_SCALING, 1])
   .translateExtent([
-    [-6300, -3145],
-    [6300, 3145],
+    [-6250, -3120],
+    [6250, 3120],
   ])
   .on("zoom", zooming);
 
-//create elements in DOM
-var svg = d3.select("svg").attr("width", WIDTH).attr("height", HEIGHT);
-var map = svg
-  .append("g")
-  .attr("id", "map")
-  .call(zoom)
-  .call(zoom.transform, d3.zoomIdentity.translate(WIDTH / 2, HEIGHT / 2).scale(0.0793));
-
-//worldmap with earthquakes + storm data
-var oceans = map.append("g").attr("id", "oceans");
-var countries = map.append("g").attr("id", "countries");
-var tecPlates = map.append("g").attr("id", "tectonicPlates");
-var eq = map.append("g").attr("id", "earthquakes");
-
-//chart for displaying yearly earthquakes
-d3.select("#yearlyEqContainer")
-  .attr("width", WIDTH)
-  .attr("height", HEIGHT / 2);
-
-var yearlyEqSvg = d3
-  .select("#yearlyEqChart")
-  .attr("width", WIDTH)
-  .attr("height", HEIGHT / 2);
+map.call(zoom).call(zoom.transform, d3.zoomIdentity.translate(WIDTH / 2, HEIGHT / 2).scale(MAP_SCALING));
 
 //init rangeSlider for filtering yearly earthquakes
 //default range -> 1999-2002
 var slider = createD3RangeSlider(1970, 2013, "#yearlyEqContainer");
 slider.range(START_YEAR, END_YEAR);
-
-//define xScale
-var xScale = d3.scaleBand().range([MARGIN, WIDTH - 15]);
-
-//define yScale
-var yScale = d3.scaleLinear().range([HEIGHT / 2 - MARGIN, 5]);
 
 //load .geojson-files of countries
 d3.json("./../data/ne_110m_admin_0_countries.geojson").then(function (countriesJSON) {
@@ -277,7 +276,7 @@ function renderYearlyEarthquakes(earthquakes) {
   });
 
   //define xScale
-  xScale.domain(d3.range(yearlyEq.length));
+  xScale.domain(d3.range(yearlyEq.length)).paddingInner(0.5);
 
   //define yScale
   yScale.domain([0, d3.max(yearlyEq, (d) => d.one + d.two + d.three + d.four + 5)]);
@@ -345,12 +344,12 @@ function enterYearlyEqBars(series) {
     })
     .attr("count", (d) => d[1] - d[0])
     .attr("x", function (d, i) {
-      return xScale(i) + 7;
+      return xScale(i);
     })
     .attr("y", function (d) {
       return yScale(d[1]);
     })
-    .attr("width", 8)
+    .attr("width", xScale.bandwidth())
     .attr("height", function (d) {
       return yScale(d[0]) - yScale(d[1]);
     })
@@ -387,7 +386,7 @@ function enterYearlyEqBars(series) {
       d3.select("#yearlyEqChart")
         .selectAll("." + year)
         .transition()
-        .attr("width", 12);
+        .attr("width", xScale.bandwidth()+4);
     })
     .on("mouseout", function (d) {
       var year = d3.select(this).attr("class");
@@ -428,7 +427,7 @@ function updateYearlyEqBars(series) {
     .attr("y", function (d) {
       return yScale(d[1]);
     })
-    .attr("width", 8)
+    .attr("width", xScale.bandwidth())
     .attr("height", function (d) {
       return yScale(d[0]) - yScale(d[1]);
     });
@@ -610,7 +609,7 @@ function getMagnitudeColor(magnitude) {
 
 //resets the map zoom and translation to the default values
 function resetView() {
-  map.call(zoom.transform, d3.zoomIdentity.translate(WIDTH / 2, HEIGHT / 2).scale(0.0793));
+  map.call(zoom.transform, d3.zoomIdentity.translate(WIDTH / 2, HEIGHT / 2).scale(MAP_SCALING));
 }
 
 // returns slope, intercept and r-square of the line
