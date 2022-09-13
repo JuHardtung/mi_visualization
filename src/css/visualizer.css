@@ -55,14 +55,14 @@ label, .label {
 #slider-container {
   margin: auto;
   display: block;
-  max-width: 760px;
+  max-width: 765px;
 }
 
 .slider {
   position: absolute;
   border: 1px solid #AAB;
   background: rgba(187, 204, 238, 0.85);
-  height: 70%;
+  height: 50%;
   width: 58px;
   top: 4px;
   cursor: move;
@@ -93,6 +93,7 @@ label, .label {
 
 #settingsContainer {
   display: flex;
+  justify-content: center;
 }
 
 button {
@@ -102,7 +103,6 @@ button {
   border-radius: 5px;
   padding: 3px;
   margin: 4px;
-  /* display: inline-flex; */
   align-items: center;
   cursor: pointer;
   height: 38px;

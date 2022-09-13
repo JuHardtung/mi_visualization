@@ -186,7 +186,7 @@ function enterEqCircles(data) {
   EQ_SCALE = d3
     .scalePow()
     .domain([d3.min(data, (d) => d.Magnitude), d3.max(data, (d) => d.Magnitude)])
-    .range([5, 10]);
+    .range([5, 15]);
 
   //add earthquake circles to DOM
   eq.selectAll("circle")
@@ -252,7 +252,6 @@ function updateEqCircles(data) {
   svg
     .selectAll("circle")
     .data(data)
-    .transition()
     .attr("magnitude", (d) => d.Magnitude)
     .attr("lat", (d) => d.Latitude)
     .attr("long", (d) => d.Longitude)
@@ -383,7 +382,8 @@ function enterYearlyEqBars(series) {
         .style("stroke", function(d) {
           if(d.DateTime.substring(0,4) == plainYear) {
             return "black";
-          }});
+          }})
+        .style("stroke-width", "2px");
 
       //set earthquake tooltip data
       d3.select("#yearlyEqTooltip").select("#eqCat1").text(eqCat1);
@@ -537,7 +537,7 @@ function countYearlyEqs(earthquakes) {
   //count the amount of earthquakes for each year
   for (var i = 0; i < earthquakes.length; i++) {
     var year = earthquakes[i].DateTime.substring(0, 4);
-    var cat = checkEqCategorie(earthquakes[i].Magnitude);
+    var cat = getEqCategorie(earthquakes[i].Magnitude);
 
     for (var j = 0; j < yearlyEq.length; j++) {
       if (1970 + j == year) {
@@ -557,7 +557,8 @@ function countYearlyEqs(earthquakes) {
   return yearlyEq;
 }
 
-function checkEqCategorie(magnitude) {
+//categorizes an earthquake in one of four categories according to the magnitude
+function getEqCategorie(magnitude) {
   if (magnitude <= 6.0) {
     return 1;
   } else if (magnitude > 6.0 && magnitude <= 7.0) {
@@ -611,15 +612,16 @@ function renderTecPlates() {
   });
 }
 
+//returns the intensity color according to the magnitude of the earthquake
 function getMagnitudeColor(magnitude) {
   if (magnitude <= 6.0) {
-    return "rgb(253, 250, 38, 0.8)";
+    return "rgb(253, 250, 38, 0.9)";
   } else if (magnitude >= 6.0 && magnitude <= 7.0) {
-    return "rgb(254, 125, 19, 0.8)";
+    return "rgb(254, 125, 19, 0.9)";
   } else if (magnitude >= 7.0 && magnitude <= 8.0) {
-    return "rgb(255, 0, 0, 0.8)";
+    return "rgb(255, 0, 0, 0.9)";
   } else if (magnitude >= 8.0) {
-    return "rgb(50, 50, 50, 0.8)";
+    return "rgb(25, 25, 25, 0.9)";
   }
 }
 
@@ -660,4 +662,14 @@ function leastSquares(xSeries, ySeries) {
   var rSquare = Math.pow(ssXY, 2) / (ssXX * ssYY);
 
   return [slope, intercept, rSquare];
+}
+
+//shows or hides the magnitude filter
+function toogleEarthquakeFilter() {
+  var x = document.getElementById("magnitudeFilter");
+  if (x.style.display === "none") {
+    x.style.display = "flex";
+  } else {
+    x.style.display = "none";
+  }
 }

@@ -319,12 +319,17 @@ function getSliderWidth() {
 
 //calculates the left slider offset for dynamic screen sizes
 function getLeftOffset() {
-  return 1 + window.innerWidth/100*0.3;
+  var leftOffset = 1 + window.innerWidth/100*0.3;
+
+  if (leftOffset > 3) {
+    return 3;
+  }
+  return leftOffset;
 }
 
 //calculates the slider top offset for dynamic screen sizes
 function getTopOffset() {
-  var offset = -25 - window.innerWidth/100 *2;
+  var offset = -3 - window.innerWidth/100 *2;
 
   if (offset < -40 ) {
     return -40;
